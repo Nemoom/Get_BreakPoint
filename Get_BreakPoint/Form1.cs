@@ -136,202 +136,210 @@ namespace Get_BreakPoint
                 }
                 System.Threading.Thread.Sleep(500);
             }
-            using (StreamReader sReader = new StreamReader(FileName))
+            try
             {
-                deltaPoints_position = new List<double>();
-                deltaPoints_time = new List<double>();
-                ks = new List<double>();
-                mPoints1 = new List<mPoint>();
-                mPoints2 = new List<mPoint>();
-                mPoints3 = new List<mPoint>();
-                mPoints4 = new List<mPoint>();
-                mPoints5 = new List<mPoint>();
-                jumpPoints = new List<mPoint>();
-                dropPoints = new List<mPoint>();
-                while (sReader.Peek()>=0)
+                using (StreamReader sReader = new StreamReader(FileName))
                 {
-                    string mStr = sReader.ReadLine();
-                    if (mStr.Length>8)
+                    deltaPoints_position = new List<double>();
+                    deltaPoints_time = new List<double>();
+                    ks = new List<double>();
+                    mPoints1 = new List<mPoint>();
+                    mPoints2 = new List<mPoint>();
+                    mPoints3 = new List<mPoint>();
+                    mPoints4 = new List<mPoint>();
+                    mPoints5 = new List<mPoint>();
+                    jumpPoints = new List<mPoint>();
+                    dropPoints = new List<mPoint>();
+                    while (sReader.Peek() >= 0)
                     {
-                        if (mStr.Substring(0, 8) == "[Record ")
+                        string mStr = sReader.ReadLine();
+                        if (mStr.Length > 8)
                         {
-                            //recordIndex++;
-                            recordIndex = Convert.ToInt32(mStr.Split(' ')[1].Substring(0, mStr.Split(' ')[1].Length - 1));
-                            mStr = sReader.ReadLine();//No. points:;1923
-                            int recordLength = Convert.ToInt32(mStr.Split(';')[1]);
-                            mStr = sReader.ReadLine();//[Point];[Position];[Force]
-                            #region 将所有的点录入List
-                            for (int i = 0; i < recordLength; i++)
+                            if (mStr.Substring(0, 8) == "[Record ")
                             {
-                                mStr = sReader.ReadLine();
+                                //recordIndex++;
+                                recordIndex = Convert.ToInt32(mStr.Split(' ')[1].Substring(0, mStr.Split(' ')[1].Length - 1));
+                                mStr = sReader.ReadLine();//No. points:;1923
+                                int recordLength = Convert.ToInt32(mStr.Split(';')[1]);
+                                mStr = sReader.ReadLine();//[Point];[Position];[Force]
+                                #region 将所有的点录入List
+                                for (int i = 0; i < recordLength; i++)
+                                {
+                                    mStr = sReader.ReadLine();
+                                    switch (recordIndex)
+                                    {
+                                        case 1:
+                                            mPoints1.Add(new mPoint(mStr.Split(';')[0], mStr.Split(';')[1], mStr.Split(';')[2]));
+                                            break;
+                                        case 2:
+                                            mPoints2.Add(new mPoint(mStr.Split(';')[0], mStr.Split(';')[1], mStr.Split(';')[2]));
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                                #endregion
+
                                 switch (recordIndex)
                                 {
                                     case 1:
-                                        mPoints1.Add(new mPoint(mStr.Split(';')[0], mStr.Split(';')[1], mStr.Split(';')[2]));
+                                        listBox1.Items.Add("Record 1");
+                                        for (int i = 1; i < mPoints1.Count - 1; i++)
+                                        {
+                                            deltaPoints_position.Add(((mPoints1[i + 1].Force - mPoints1[i].Force) / ((mPoints1[i + 1].Position - mPoints1[i].Position)))
+                                                - ((mPoints1[i].Force - mPoints1[i - 1].Force) / ((mPoints1[i].Position - mPoints1[i - 1].Position))));
+                                            deltaPoints_time.Add(((mPoints1[i + 1].Force - mPoints1[i].Force))
+                                                - ((mPoints1[i].Force - mPoints1[i - 1].Force)));
+                                            ks.Add((mPoints1[i].Force - mPoints1[i - 1].Force) / ((mPoints1[i].Position - mPoints1[i - 1].Position)));
+                                        }
+
+                                        bool b_Triggered = false;
+                                        for (int i = 0; i < ks.Count; i++)
+                                        {
+                                            if (!b_Triggered)//寻找连续大于
+                                            {
+                                                if (ks[i] >= Convert.ToDouble(nUD_K.Value))
+                                                {
+                                                    bool b_Continuity = true;
+                                                    for (int j = 0; j < Convert.ToInt32(nUD_Continuity.Value); j++)
+                                                    {
+                                                        if (ks[i + 1 + j] < Convert.ToDouble(nUD_K.Value))
+                                                        {
+                                                            b_Continuity = false;
+                                                        }
+                                                    }
+                                                    if (b_Continuity)//满足连续性，b_Triggered至1，jumpPoints.Add
+                                                    {
+                                                        b_Triggered = true;
+                                                        jumpPoints.Add(mPoints1[i + 1]);
+                                                    }
+                                                }
+                                            }
+                                            else//寻找连续小于
+                                            {
+                                                if (ks[i] < Convert.ToDouble(nUD_K.Value))
+                                                {
+                                                    bool b_Continuity = true;
+                                                    for (int j = 0; j < Convert.ToInt32(nUD_Continuity.Value); j++)
+                                                    {
+                                                        if (ks[i + 1 + j] >= Convert.ToDouble(nUD_K.Value))
+                                                        {
+                                                            b_Continuity = false;
+                                                        }
+                                                    }
+                                                    if (b_Continuity)//满足连续性，b_Triggered至0，dropPoints.Add
+                                                    {
+                                                        b_Triggered = false;
+                                                        dropPoints.Add(mPoints1[i + 1]);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        for (int i = 0; i < jumpPoints.Count; i++)
+                                        {
+                                            listBox1.Items.Add("jumpPoints     Index:" + jumpPoints[i].Index.ToString() +
+                                            " Position:" + jumpPoints[i].Position.ToString() +
+                                            " Force:" + jumpPoints[i].Force.ToString());
+                                        }
+                                        //maxIndex = deltaPoints_position.FindIndex(item => item.Equals(deltaPoints_position.Max()));
+                                        //minIndex = deltaPoints_position.FindIndex(item => item.Equals(deltaPoints_position.Min()));
+                                        //listBox1.Items.Add("Max_position     Index:" + (maxIndex + 1).ToString() + 
+                                        //    " Position:" + mPoints1[maxIndex + 1].Position.ToString() +
+                                        //    " Force:" + mPoints1[maxIndex + 1].Force.ToString());
+                                        //listBox1.Items.Add("Min_position     Index:" + (minIndex + 1).ToString() +
+                                        //    " Position:" + mPoints1[minIndex + 1].Position.ToString() +
+                                        //    " Force:" + mPoints1[minIndex + 1].Force.ToString());
+                                        //for (int i = 0; i < ks.Count; i++)
+                                        //{
+                                        //    if (ks[i] > Convert.ToDouble(nUD_K.Value))
+                                        //    {
+                                        //        bool b_Continuity = true;
+                                        //        for (int j = 0; j < Convert.ToInt32(nUD_Continuity.Value); j++)
+                                        //        {
+                                        //            if (ks[i+1+j]< Convert.ToDouble(nUD_K.Value))
+                                        //            {
+                                        //                b_Continuity = false;
+                                        //            }
+                                        //        }
+                                        //        if (b_Continuity)
+                                        //        {
+                                        //            touchIndex = i;
+                                        //        break;
+                                        //        }
+
+                                        //    }
+                                        //}
+                                        //listBox1.Items.Add("接触点     Index:" + (touchIndex + 1).ToString() +
+                                        //    " Position:" + mPoints1[touchIndex + 1].Position.ToString() +
+                                        //    " Force:" + mPoints1[touchIndex + 1].Force.ToString());
+                                        //maxIndex = deltaPoints_time.FindIndex(item => item.Equals(deltaPoints_time.Max()));
+                                        //minIndex = deltaPoints_time.FindIndex(item => item.Equals(deltaPoints_time.Min()));
+                                        //listBox1.Items.Add("陡增点     Index:" + (maxIndex + 1).ToString() + 
+                                        //    " Position:" + mPoints1[maxIndex + 1].Position.ToString() +
+                                        //    " Force:" + mPoints1[maxIndex + 1].Force.ToString());
+                                        //listBox1.Items.Add("突降点     Index:" + (minIndex + 1).ToString() +
+                                        //    " Position:" + mPoints1[minIndex + 1].Position.ToString() +
+                                        //    " Force:" + mPoints1[minIndex + 1].Force.ToString());
+                                        deltaPoints_position = new List<double>();
+                                        deltaPoints_time = new List<double>();
+                                        ks = new List<double>();
                                         break;
                                     case 2:
-                                        mPoints2.Add(new mPoint(mStr.Split(';')[0], mStr.Split(';')[1], mStr.Split(';')[2]));
+                                        listBox1.Items.Add("Record 2");
+                                        for (int i = 1; i < mPoints2.Count - 1; i++)
+                                        {
+                                            deltaPoints_position.Add(((mPoints2[i + 1].Force - mPoints2[i].Force) / ((mPoints2[i + 1].Position - mPoints2[i].Position) * 1000))
+                                                - ((mPoints2[i].Force - mPoints2[i - 1].Force) / ((mPoints2[i].Position - mPoints2[i - 1].Position) * 1000)));
+                                            deltaPoints_time.Add(((mPoints2[i + 1].Force - mPoints2[i].Force))
+                                                - ((mPoints2[i].Force - mPoints2[i - 1].Force)));
+                                            ks.Add((mPoints2[i].Force - mPoints2[i - 1].Force) / ((mPoints2[i].Position - mPoints2[i - 1].Position) * 10));
+                                        }
+                                        //maxIndex = deltaPoints_position.FindIndex(item => item.Equals(deltaPoints_position.Max()));
+                                        //minIndex = deltaPoints_position.FindIndex(item => item.Equals(deltaPoints_position.Min()));
+                                        //listBox1.Items.Add("Max_position     Index:" + (maxIndex + 1).ToString() + 
+                                        //    " Position:" + mPoints2[maxIndex + 1].Position.ToString() +
+                                        //    " Force:" + mPoints2[maxIndex + 1].Force.ToString());
+                                        //listBox1.Items.Add("Min_position     Index:" + (minIndex + 1).ToString() +
+                                        //    " Position:" + mPoints2[minIndex + 1].Position.ToString() +
+                                        //    " Force:" + mPoints2[minIndex + 1].Force.ToString());
+
+                                        maxIndex = deltaPoints_time.FindIndex(item => item.Equals(deltaPoints_time.Max()));
+                                        minIndex = deltaPoints_time.FindIndex(item => item.Equals(deltaPoints_time.Min()));
+                                        listBox1.Items.Add("陡增点     Index:" + (maxIndex + 1).ToString() +
+                                            " Position:" + mPoints2[maxIndex + 1].Position.ToString() +
+                                            " Force:" + mPoints2[maxIndex + 1].Force.ToString());
+                                        listBox1.Items.Add("突降点     Index:" + (minIndex + 1).ToString() +
+                                            " Position:" + mPoints2[minIndex + 1].Position.ToString() +
+                                            " Force:" + mPoints2[minIndex + 1].Force.ToString());
+                                        deltaPoints_position = new List<double>();
+                                        deltaPoints_time = new List<double>();
+                                        ks = new List<double>();
                                         break;
                                     default:
                                         break;
                                 }
-                            } 
-                            #endregion
-
-                            switch (recordIndex)
-                            {
-                                case 1:
-                                    listBox1.Items.Add("Record 1");
-                                    for (int i = 1; i < mPoints1.Count-1; i++)
-                                    {
-                                        deltaPoints_position.Add(((mPoints1[i + 1].Force - mPoints1[i].Force) / ((mPoints1[i + 1].Position - mPoints1[i].Position)))
-                                            - ((mPoints1[i].Force - mPoints1[i - 1].Force) / ((mPoints1[i].Position - mPoints1[i - 1].Position))));
-                                        deltaPoints_time.Add(((mPoints1[i + 1].Force - mPoints1[i].Force))
-                                            - ((mPoints1[i].Force - mPoints1[i - 1].Force)));
-                                        ks.Add((mPoints1[i].Force - mPoints1[i - 1].Force) / ((mPoints1[i].Position - mPoints1[i - 1].Position)));
-                                    }
-
-                                    bool b_Triggered = false;
-                                    for (int i = 0; i < ks.Count; i++)
-                                    {
-                                        if (!b_Triggered)//寻找连续大于
-                                        {
-                                            if (ks[i] >= Convert.ToDouble(nUD_K.Value))
-                                            {
-                                                bool b_Continuity = true;
-                                                for (int j = 0; j < Convert.ToInt32(nUD_Continuity.Value); j++)
-                                                {
-                                                    if (ks[i + 1 + j] < Convert.ToDouble(nUD_K.Value))
-                                                    {
-                                                        b_Continuity = false;
-                                                    }
-                                                }
-                                                if (b_Continuity)//满足连续性，b_Triggered至1，jumpPoints.Add
-                                                {
-                                                    b_Triggered = true;
-                                                    jumpPoints.Add(mPoints1[i + 1]);
-                                                }
-                                            }
-                                        }
-                                        else//寻找连续小于
-                                        {
-                                            if (ks[i] < Convert.ToDouble(nUD_K.Value))
-                                            {
-                                                bool b_Continuity = true;
-                                                for (int j = 0; j < Convert.ToInt32(nUD_Continuity.Value); j++)
-                                                {
-                                                    if (ks[i + 1 + j] >= Convert.ToDouble(nUD_K.Value))
-                                                    {
-                                                        b_Continuity = false;
-                                                    }
-                                                }
-                                                if (b_Continuity)//满足连续性，b_Triggered至0，dropPoints.Add
-                                                {
-                                                    b_Triggered = false;
-                                                    dropPoints.Add(mPoints1[i + 1]);
-                                                }
-                                            }
-                                        }                                        
-                                    }
-                                    for (int i = 0; i < jumpPoints.Count; i++)
-                                    {
-                                        listBox1.Items.Add("jumpPoints     Index:" + jumpPoints[i].Index.ToString() + 
-                                        " Position:" + jumpPoints[i].Position.ToString() +
-                                        " Force:" + jumpPoints[i].Force.ToString());
-                                    }
-                                    //maxIndex = deltaPoints_position.FindIndex(item => item.Equals(deltaPoints_position.Max()));
-                                    //minIndex = deltaPoints_position.FindIndex(item => item.Equals(deltaPoints_position.Min()));
-                                    //listBox1.Items.Add("Max_position     Index:" + (maxIndex + 1).ToString() + 
-                                    //    " Position:" + mPoints1[maxIndex + 1].Position.ToString() +
-                                    //    " Force:" + mPoints1[maxIndex + 1].Force.ToString());
-                                    //listBox1.Items.Add("Min_position     Index:" + (minIndex + 1).ToString() +
-                                    //    " Position:" + mPoints1[minIndex + 1].Position.ToString() +
-                                    //    " Force:" + mPoints1[minIndex + 1].Force.ToString());
-                                    //for (int i = 0; i < ks.Count; i++)
-                                    //{
-                                    //    if (ks[i] > Convert.ToDouble(nUD_K.Value))
-                                    //    {
-                                    //        bool b_Continuity = true;
-                                    //        for (int j = 0; j < Convert.ToInt32(nUD_Continuity.Value); j++)
-                                    //        {
-                                    //            if (ks[i+1+j]< Convert.ToDouble(nUD_K.Value))
-                                    //            {
-                                    //                b_Continuity = false;
-                                    //            }
-                                    //        }
-                                    //        if (b_Continuity)
-                                    //        {
-                                    //            touchIndex = i;
-                                    //        break;
-                                    //        }
-                                            
-                                    //    }
-                                    //}
-                                    //listBox1.Items.Add("接触点     Index:" + (touchIndex + 1).ToString() +
-                                    //    " Position:" + mPoints1[touchIndex + 1].Position.ToString() +
-                                    //    " Force:" + mPoints1[touchIndex + 1].Force.ToString());
-                                    //maxIndex = deltaPoints_time.FindIndex(item => item.Equals(deltaPoints_time.Max()));
-                                    //minIndex = deltaPoints_time.FindIndex(item => item.Equals(deltaPoints_time.Min()));
-                                    //listBox1.Items.Add("陡增点     Index:" + (maxIndex + 1).ToString() + 
-                                    //    " Position:" + mPoints1[maxIndex + 1].Position.ToString() +
-                                    //    " Force:" + mPoints1[maxIndex + 1].Force.ToString());
-                                    //listBox1.Items.Add("突降点     Index:" + (minIndex + 1).ToString() +
-                                    //    " Position:" + mPoints1[minIndex + 1].Position.ToString() +
-                                    //    " Force:" + mPoints1[minIndex + 1].Force.ToString());
-                                    deltaPoints_position = new List<double>();
-                                    deltaPoints_time = new List<double>();
-                                    ks = new List<double>();
-                                    break;
-                                case 2:
-                                    listBox1.Items.Add("Record 2");
-                                    for (int i = 1; i < mPoints2.Count-1; i++)
-                                    {
-                                        deltaPoints_position.Add(((mPoints2[i + 1].Force - mPoints2[i].Force) / ((mPoints2[i + 1].Position - mPoints2[i].Position)* 1000))
-                                            - ((mPoints2[i].Force - mPoints2[i - 1].Force) / ((mPoints2[i].Position - mPoints2[i - 1].Position) * 1000)));
-                                        deltaPoints_time.Add(((mPoints2[i + 1].Force - mPoints2[i].Force))
-                                            - ((mPoints2[i].Force - mPoints2[i - 1].Force)));
-                                        ks.Add((mPoints2[i].Force - mPoints2[i - 1].Force) / ((mPoints2[i].Position - mPoints2[i - 1].Position)*10));
-                                    }
-                                    //maxIndex = deltaPoints_position.FindIndex(item => item.Equals(deltaPoints_position.Max()));
-                                    //minIndex = deltaPoints_position.FindIndex(item => item.Equals(deltaPoints_position.Min()));
-                                    //listBox1.Items.Add("Max_position     Index:" + (maxIndex + 1).ToString() + 
-                                    //    " Position:" + mPoints2[maxIndex + 1].Position.ToString() +
-                                    //    " Force:" + mPoints2[maxIndex + 1].Force.ToString());
-                                    //listBox1.Items.Add("Min_position     Index:" + (minIndex + 1).ToString() +
-                                    //    " Position:" + mPoints2[minIndex + 1].Position.ToString() +
-                                    //    " Force:" + mPoints2[minIndex + 1].Force.ToString());
-
-                                    maxIndex = deltaPoints_time.FindIndex(item => item.Equals(deltaPoints_time.Max()));
-                                    minIndex = deltaPoints_time.FindIndex(item => item.Equals(deltaPoints_time.Min()));
-                                    listBox1.Items.Add("陡增点     Index:" + (maxIndex + 1).ToString() + 
-                                        " Position:" + mPoints2[maxIndex + 1].Position.ToString() +
-                                        " Force:" + mPoints2[maxIndex + 1].Force.ToString());
-                                    listBox1.Items.Add("突降点     Index:" + (minIndex + 1).ToString() +
-                                        " Position:" + mPoints2[minIndex + 1].Position.ToString() +
-                                        " Force:" + mPoints2[minIndex + 1].Force.ToString());
-                                    deltaPoints_position = new List<double>();
-                                    deltaPoints_time = new List<double>();
-                                    ks = new List<double>();
-                                    break;
-                                default:
-                                    break;
                             }
-                        } 
+                        }
                     }
+                    mResult = true;
                 }
-                mResult = true;
+                if (jumpPoints.Count > 1)
+                {
+                    //writeLog(label3.Text + " Index:" + jumpPoints[1].Index.ToString() +
+                    //            " Position:" + jumpPoints[1].Position.ToString() +
+                    //            " Force:" + jumpPoints[1].Force.ToString());
+                    writeCSV(jumpPoints[1].Index, jumpPoints[1].Position, jumpPoints[1].Force, FileName.Split('_')[FileName.Split('_').Length - 1].Substring(0, 2), FileName.Split('\\')[FileName.Split('\\').Length - 1]);
+                }
+                else
+                {
+                    //writeCSV(jumpPoints[0].Index, jumpPoints[0].Position, jumpPoints[0].Force, FileName.Split('_')[FileName.Split('_').Length - 1].Substring(0, 2), FileName.Split('\\')[FileName.Split('\\').Length - 1]);
+                    writeCSV(-1, -1, -1, FileName.Split('_')[FileName.Split('_').Length - 1].Substring(0, 2), FileName.Split('\\')[FileName.Split('\\').Length - 1]);
+                }
             }
-            if (jumpPoints.Count > 1)
+            catch (Exception ex)
             {
-                //writeLog(label3.Text + " Index:" + jumpPoints[1].Index.ToString() +
-                //            " Position:" + jumpPoints[1].Position.ToString() +
-                //            " Force:" + jumpPoints[1].Force.ToString());
-                writeCSV(jumpPoints[1].Index, jumpPoints[1].Position, jumpPoints[1].Force, FileName.Split('_')[FileName.Split('_').Length - 1].Substring(0, 2), FileName.Split('\\')[FileName.Split('\\').Length - 1]);
-            }
-            else
-            {
-                //writeCSV(jumpPoints[0].Index, jumpPoints[0].Position, jumpPoints[0].Force, FileName.Split('_')[FileName.Split('_').Length - 1].Substring(0, 2), FileName.Split('\\')[FileName.Split('\\').Length - 1]);
-                writeCSV(-1, jumpPoints[0].Position, jumpPoints[0].Force, FileName.Split('_')[FileName.Split('_').Length - 1].Substring(0, 2), FileName.Split('\\')[FileName.Split('\\').Length - 1]);
+                MessageBox.Show(ex.Message);
+                return false;
             }
             return mResult;
         }
