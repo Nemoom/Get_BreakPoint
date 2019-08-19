@@ -46,7 +46,7 @@ namespace Get_BreakPoint
                     fileSystemWatcher1.Created += new FileSystemEventHandler(fileSystemWatcher1_Created);
                     fileSystemWatcher1.Changed += new FileSystemEventHandler(fileSystemWatcher1_Changed);
                     fileSystemWatcher1.EnableRaisingEvents = true;
-
+                    button1.BackColor = System.Drawing.SystemColors.ActiveCaption;
                     button1.Text = "Stop";
                 }
                 else
@@ -59,9 +59,8 @@ namespace Get_BreakPoint
                 fileSystemWatcher1.EnableRaisingEvents = false;
                 fileSystemWatcher1.Created -= new FileSystemEventHandler(fileSystemWatcher1_Created);
                 fileSystemWatcher1.Changed -= new FileSystemEventHandler(fileSystemWatcher1_Changed);
-
+                button1.BackColor = System.Drawing.SystemColors.Control;
                 button1.Text = "Start";
-
             }
             
         }
@@ -327,11 +326,12 @@ namespace Get_BreakPoint
                 //writeLog(label3.Text + " Index:" + jumpPoints[1].Index.ToString() +
                 //            " Position:" + jumpPoints[1].Position.ToString() +
                 //            " Force:" + jumpPoints[1].Force.ToString());
-                writeCSV(jumpPoints[1].Index, jumpPoints[1].Position, jumpPoints[1].Force, FileName, FileName);
+                writeCSV(jumpPoints[1].Index, jumpPoints[1].Position, jumpPoints[1].Force, FileName.Split('_')[FileName.Split('_').Length - 1].Substring(0, 2), FileName.Split('\\')[FileName.Split('\\').Length - 1]);
             }
             else
             {
-                writeCSV(jumpPoints[0].Index, jumpPoints[0].Position, jumpPoints[0].Force, FileName, FileName);
+                //writeCSV(jumpPoints[0].Index, jumpPoints[0].Position, jumpPoints[0].Force, FileName.Split('_')[FileName.Split('_').Length - 1].Substring(0, 2), FileName.Split('\\')[FileName.Split('\\').Length - 1]);
+                writeCSV(-1, jumpPoints[0].Position, jumpPoints[0].Force, FileName.Split('_')[FileName.Split('_').Length - 1].Substring(0, 2), FileName.Split('\\')[FileName.Split('\\').Length - 1]);
             }
             return mResult;
         }
@@ -392,9 +392,17 @@ namespace Get_BreakPoint
             }
             using (StreamWriter csvFile = new StreamWriter(csvFilePath, true, Encoding.UTF8))
             {
-                line = mNo.ToString() + ","
-                    + Index.ToString() + "," + Position.ToString() + "," + Force.ToString() + ","
-                    + Result + "," + FileName + "," + DateTime.Now.ToString("HH:mm:ss");
+                if (Index != -1)
+                {
+                    line = mNo++.ToString() + ","
+                        + Index.ToString() + "," + Position.ToString() + "," + Force.ToString() + ","
+                        + Result + "," + FileName + "," + DateTime.Now.ToString("HH:mm:ss");
+                }
+                else
+                {
+                    line = mNo++.ToString() + ",NULL,NULL,NULL,"                        
+                        + Result + "," + FileName + "," + DateTime.Now.ToString("HH:mm:ss");
+                }
                 csvFile.WriteLine(line);
             }          
 
@@ -417,9 +425,12 @@ namespace Get_BreakPoint
         {
             if (folderBrowserDialog1.ShowDialog() == DialogResult.OK)
             {
+                if (button1.Text != "Start")
+                {
+                    button1_Click(sender, e);
+                }
                 textBox1.Text = folderBrowserDialog1.SelectedPath;
-                button1.Text = "Start";
-                button1.Enabled = true;
+                
                 //fileSystemWatcher1.Path = folderBrowserDialog1.SelectedPath;
                 //fileSystemWatcher1.IncludeSubdirectories = false;
                 //fileSystemWatcher1.Created += new FileSystemEventHandler(fileSystemWatcher1_Created);
@@ -545,6 +556,14 @@ namespace Get_BreakPoint
             WatchPath = textBox1.Text;
             K_Threshold = Convert.ToDouble(nUD_K.Value);
             Continuity = Convert.ToInt16(nUD_Continuity.Value);
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            if (button1.Text != "Start")
+            {
+                button1_Click(sender, e);
+            }
         }
     }
 }

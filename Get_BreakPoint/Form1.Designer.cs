@@ -104,6 +104,7 @@
             this.textBox1.Size = new System.Drawing.Size(463, 28);
             this.textBox1.TabIndex = 3;
             this.textBox1.Text = "C:\\Users\\CN0YLBBC\\Desktop\\YJKP Record";
+            this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             this.textBox1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.textBox1_MouseDoubleClick);
             // 
             // panel2
