@@ -37,30 +37,45 @@ namespace Get_BreakPoint
             //    fileSystemWatcher1.IncludeSubdirectories = false;
             //    fileSystemWatcher1.Created += new FileSystemEventHandler(fileSystemWatcher1_Created);
             //}
+            if (button1.Text=="Start")
+            {
+                if (Directory.Exists(textBox1.Text))
+                {
+                    fileSystemWatcher1.Path = textBox1.Text;
+                    fileSystemWatcher1.IncludeSubdirectories = false;
+                    fileSystemWatcher1.Created += new FileSystemEventHandler(fileSystemWatcher1_Created);
+                    fileSystemWatcher1.Changed += new FileSystemEventHandler(fileSystemWatcher1_Changed);
+                    fileSystemWatcher1.EnableRaisingEvents = true;
 
-            fileSystemWatcher1.Path = textBox1.Text ;
-            fileSystemWatcher1.IncludeSubdirectories = false;
-            fileSystemWatcher1.Created += new FileSystemEventHandler(fileSystemWatcher1_Created);
+                    button1.Text = "Stop";
+                }
+                else
+                {
+                    MessageBox.Show("不存在的监控路径");
+                }                
+            }
+            else
+            {
+                fileSystemWatcher1.EnableRaisingEvents = false;
+                fileSystemWatcher1.Created -= new FileSystemEventHandler(fileSystemWatcher1_Created);
+                fileSystemWatcher1.Changed -= new FileSystemEventHandler(fileSystemWatcher1_Changed);
+
+                button1.Text = "Start";
+
+            }
             
-            fileSystemWatcher1.Changed += new FileSystemEventHandler(fileSystemWatcher1_Changed);
-            button1.Text = "Started";
-            button1.Enabled = false;
         }
 
         void fileSystemWatcher1_Changed(object sender, FileSystemEventArgs e)
         {
             //throw new NotImplementedException();
-        }
-
-        
+        }        
 
         void fileSystemWatcher1_Created(object sender, FileSystemEventArgs e)
         {
-            label3.Text = "FileName：" + e.Name;
+            label3.Text = "FileName:" + e.Name;
             get_Points(e.FullPath);
         }
-
-
 
         public class mPoint
         {
@@ -307,10 +322,82 @@ namespace Get_BreakPoint
                 }
                 mResult = true;
             }
-            writeLog(label3.Text + " Index:" + jumpPoints[1].Index.ToString() +
-                                        " Position:" + jumpPoints[1].Position.ToString() +
-                                        " Force:" + jumpPoints[1].Force.ToString());
+            if (jumpPoints.Count > 1)
+            {
+                //writeLog(label3.Text + " Index:" + jumpPoints[1].Index.ToString() +
+                //            " Position:" + jumpPoints[1].Position.ToString() +
+                //            " Force:" + jumpPoints[1].Force.ToString());
+                writeCSV(jumpPoints[1].Index, jumpPoints[1].Position, jumpPoints[1].Force, FileName, FileName);
+            }
+            else
+            {
+                writeCSV(jumpPoints[0].Index, jumpPoints[0].Position, jumpPoints[0].Force, FileName, FileName);
+            }
             return mResult;
+        }
+        int mNo = 0;
+        public void writeCSV(int Index,double Position,double Force,string Result,string FileName)
+        {            
+            string line = string.Empty;
+            const string LOG_DIR = "logs";
+            string csvFilePath = Path.Combine(LOG_DIR, DateTime.Now.ToString("yyyy-MM-dd") + ".csv");
+            if (!Directory.Exists(LOG_DIR)) Directory.CreateDirectory(LOG_DIR);
+            
+            if (!File.Exists(csvFilePath))
+            {
+                //写入表头
+                using (StreamWriter csvFile = new StreamWriter(csvFilePath, true, Encoding.UTF8))
+                {
+                    line = "No.,Index,Position(mm),Force(N),Result,FileName,Time(h:m:s)";
+                    csvFile.WriteLine(line);
+                }
+                
+                mNo = 1;
+            }
+            else
+            {
+                //StreamReader mReader = new StreamReader(csvFilePath);
+                //while (mReader.ReadLine() != null)
+                //{ mNo += 1; }
+                //mReader.Close();
+                if (mNo==0)
+                {
+                    string oldValue = string.Empty, newValue = string.Empty;
+                    using (StreamReader read = new StreamReader(csvFilePath, true))
+                    {
+                        do
+                        {
+                            newValue = read.ReadLine();
+                            oldValue = newValue != null ? newValue : oldValue;
+                        } while (newValue != null);
+                    }
+                    if (oldValue=="")
+                    {
+                        mNo = 1;
+
+                    }
+                    else
+                    {
+                        try
+                        {
+                            mNo = Convert.ToInt32(oldValue.Split(',')[0]) + 1;
+                        }
+                        catch (Exception)
+                        {
+                            mNo = 1;
+                        }
+
+                    }
+                }                
+            }
+            using (StreamWriter csvFile = new StreamWriter(csvFilePath, true, Encoding.UTF8))
+            {
+                line = mNo.ToString() + ","
+                    + Index.ToString() + "," + Position.ToString() + "," + Force.ToString() + ","
+                    + Result + "," + FileName + "," + DateTime.Now.ToString("HH:mm:ss");
+                csvFile.WriteLine(line);
+            }          
+
         }
 
         public void writeLog(string content, params object[] logStringFormatArgs)
@@ -337,6 +424,127 @@ namespace Get_BreakPoint
                 //fileSystemWatcher1.IncludeSubdirectories = false;
                 //fileSystemWatcher1.Created += new FileSystemEventHandler(fileSystemWatcher1_Created);
             }
+        }
+
+        public string WatchPath 
+        {
+            get
+            {
+                if (File.Exists("config.ini"))
+                {
+                    IniFile ini = new IniFile("config.ini");
+                    if (!ini.KeyExists("WatchPath"))
+                    {
+                        return "";
+                    }
+                    string s_max = ini.Read("WatchPath");
+                    try
+                    {
+                        return s_max;
+                    }
+                    catch (Exception)
+                    {
+                        return "";
+                    }
+                }
+                else
+                {
+                    return "";
+                }
+            }
+            set
+            {
+                IniFile ini = new IniFile("config.ini");
+                ini.Write("WatchPath", value.ToString());
+                //if (File.Exists("config.ini"))
+                //{
+                    
+                //}
+            }
+        }
+
+        public double K_Threshold
+        {
+            get
+            {
+                if (File.Exists("config.ini"))
+                {
+                    IniFile ini = new IniFile("config.ini");
+                    if (!ini.KeyExists("K_Threshold"))
+                    {
+                        return -1;
+                    }
+                    string s_max = ini.Read("K_Threshold");
+                    try
+                    {
+                        return Convert.ToDouble(s_max);
+                    }
+                    catch (Exception)
+                    {
+                        return -1;
+                    }
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+            set
+            {
+                IniFile ini = new IniFile("config.ini");
+                ini.Write("K_Threshold", value.ToString());
+            }
+        }
+
+        public int Continuity
+        {
+            get
+            {
+                if (File.Exists("config.ini"))
+                {
+                    IniFile ini = new IniFile("config.ini");
+                    if (!ini.KeyExists("Continuity"))
+                    {
+                        return -1;
+                    }
+                    string s_max = ini.Read("Continuity");
+                    try
+                    {
+                        return Convert.ToInt16(s_max);
+                    }
+                    catch (Exception)
+                    {
+                        return -1;
+                    }
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+            set
+            {
+                IniFile ini = new IniFile("config.ini");
+                ini.Write("Continuity", value.ToString());
+            }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            textBox1.Text = WatchPath;
+            nUD_K.Value = Convert.ToDecimal(K_Threshold);
+            nUD_Continuity.Value = Convert.ToDecimal(Continuity);
+            if (textBox1.Text != "")
+            {
+                button1_Click(sender, e);
+            }
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            WatchPath = textBox1.Text;
+            K_Threshold = Convert.ToDouble(nUD_K.Value);
+            Continuity = Convert.ToInt16(nUD_Continuity.Value);
         }
     }
 }
