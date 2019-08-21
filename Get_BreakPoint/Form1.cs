@@ -150,6 +150,7 @@ namespace Get_BreakPoint
                     mPoints5 = new List<mPoint>();
                     jumpPoints = new List<mPoint>();
                     dropPoints = new List<mPoint>();
+                    int Index_startX = 0;
                     while (sReader.Peek() >= 0)
                     {
                         string mStr = sReader.ReadLine();
@@ -186,6 +187,10 @@ namespace Get_BreakPoint
                                         listBox1.Items.Add("Record 1");
                                         for (int i = 1; i < mPoints1.Count - 1; i++)
                                         {
+                                            if (Index_startX != 0 && mPoints1[i].Position > Convert.ToDouble(nUD_MinX_Value.Value))
+                                            {
+                                                Index_startX = i;
+                                            }
                                             deltaPoints_position.Add(((mPoints1[i + 1].Force - mPoints1[i].Force) / ((mPoints1[i + 1].Position - mPoints1[i].Position)))
                                                 - ((mPoints1[i].Force - mPoints1[i - 1].Force) / ((mPoints1[i].Position - mPoints1[i - 1].Position))));
                                             deltaPoints_time.Add(((mPoints1[i + 1].Force - mPoints1[i].Force))
@@ -194,7 +199,7 @@ namespace Get_BreakPoint
                                         }
 
                                         bool b_Triggered = false;
-                                        for (int i = 0; i < ks.Count; i++)
+                                        for (int i = Index_startX; i < ks.Count; i++)
                                         {
                                             if (!b_Triggered)//寻找连续大于
                                             {
@@ -284,37 +289,37 @@ namespace Get_BreakPoint
                                         deltaPoints_time = new List<double>();
                                         ks = new List<double>();
                                         break;
-                                    case 2:
-                                        listBox1.Items.Add("Record 2");
-                                        for (int i = 1; i < mPoints2.Count - 1; i++)
-                                        {
-                                            deltaPoints_position.Add(((mPoints2[i + 1].Force - mPoints2[i].Force) / ((mPoints2[i + 1].Position - mPoints2[i].Position) * 1000))
-                                                - ((mPoints2[i].Force - mPoints2[i - 1].Force) / ((mPoints2[i].Position - mPoints2[i - 1].Position) * 1000)));
-                                            deltaPoints_time.Add(((mPoints2[i + 1].Force - mPoints2[i].Force))
-                                                - ((mPoints2[i].Force - mPoints2[i - 1].Force)));
-                                            ks.Add((mPoints2[i].Force - mPoints2[i - 1].Force) / ((mPoints2[i].Position - mPoints2[i - 1].Position) * 10));
-                                        }
-                                        //maxIndex = deltaPoints_position.FindIndex(item => item.Equals(deltaPoints_position.Max()));
-                                        //minIndex = deltaPoints_position.FindIndex(item => item.Equals(deltaPoints_position.Min()));
-                                        //listBox1.Items.Add("Max_position     Index:" + (maxIndex + 1).ToString() + 
-                                        //    " Position:" + mPoints2[maxIndex + 1].Position.ToString() +
-                                        //    " Force:" + mPoints2[maxIndex + 1].Force.ToString());
-                                        //listBox1.Items.Add("Min_position     Index:" + (minIndex + 1).ToString() +
-                                        //    " Position:" + mPoints2[minIndex + 1].Position.ToString() +
-                                        //    " Force:" + mPoints2[minIndex + 1].Force.ToString());
+                                    //case 2:
+                                    //    listBox1.Items.Add("Record 2");
+                                    //    for (int i = 1; i < mPoints2.Count - 1; i++)
+                                    //    {
+                                    //        deltaPoints_position.Add(((mPoints2[i + 1].Force - mPoints2[i].Force) / ((mPoints2[i + 1].Position - mPoints2[i].Position) * 1000))
+                                    //            - ((mPoints2[i].Force - mPoints2[i - 1].Force) / ((mPoints2[i].Position - mPoints2[i - 1].Position) * 1000)));
+                                    //        deltaPoints_time.Add(((mPoints2[i + 1].Force - mPoints2[i].Force))
+                                    //            - ((mPoints2[i].Force - mPoints2[i - 1].Force)));
+                                    //        ks.Add((mPoints2[i].Force - mPoints2[i - 1].Force) / ((mPoints2[i].Position - mPoints2[i - 1].Position) * 10));
+                                    //    }
+                                    //    //maxIndex = deltaPoints_position.FindIndex(item => item.Equals(deltaPoints_position.Max()));
+                                    //    //minIndex = deltaPoints_position.FindIndex(item => item.Equals(deltaPoints_position.Min()));
+                                    //    //listBox1.Items.Add("Max_position     Index:" + (maxIndex + 1).ToString() + 
+                                    //    //    " Position:" + mPoints2[maxIndex + 1].Position.ToString() +
+                                    //    //    " Force:" + mPoints2[maxIndex + 1].Force.ToString());
+                                    //    //listBox1.Items.Add("Min_position     Index:" + (minIndex + 1).ToString() +
+                                    //    //    " Position:" + mPoints2[minIndex + 1].Position.ToString() +
+                                    //    //    " Force:" + mPoints2[minIndex + 1].Force.ToString());
 
-                                        maxIndex = deltaPoints_time.FindIndex(item => item.Equals(deltaPoints_time.Max()));
-                                        minIndex = deltaPoints_time.FindIndex(item => item.Equals(deltaPoints_time.Min()));
-                                        listBox1.Items.Add("陡增点     Index:" + (maxIndex + 1).ToString() +
-                                            " Position:" + mPoints2[maxIndex + 1].Position.ToString() +
-                                            " Force:" + mPoints2[maxIndex + 1].Force.ToString());
-                                        listBox1.Items.Add("突降点     Index:" + (minIndex + 1).ToString() +
-                                            " Position:" + mPoints2[minIndex + 1].Position.ToString() +
-                                            " Force:" + mPoints2[minIndex + 1].Force.ToString());
-                                        deltaPoints_position = new List<double>();
-                                        deltaPoints_time = new List<double>();
-                                        ks = new List<double>();
-                                        break;
+                                    //    maxIndex = deltaPoints_time.FindIndex(item => item.Equals(deltaPoints_time.Max()));
+                                    //    minIndex = deltaPoints_time.FindIndex(item => item.Equals(deltaPoints_time.Min()));
+                                    //    listBox1.Items.Add("陡增点     Index:" + (maxIndex + 1).ToString() +
+                                    //        " Position:" + mPoints2[maxIndex + 1].Position.ToString() +
+                                    //        " Force:" + mPoints2[maxIndex + 1].Force.ToString());
+                                    //    listBox1.Items.Add("突降点     Index:" + (minIndex + 1).ToString() +
+                                    //        " Position:" + mPoints2[minIndex + 1].Position.ToString() +
+                                    //        " Force:" + mPoints2[minIndex + 1].Force.ToString());
+                                    //    deltaPoints_position = new List<double>();
+                                    //    deltaPoints_time = new List<double>();
+                                    //    ks = new List<double>();
+                                    //    break;
                                     default:
                                         break;
                                 }
@@ -322,24 +327,28 @@ namespace Get_BreakPoint
                         }
                     }
                     mResult = true;
-                }
-                if (jumpPoints.Count > 1)
-                {
-                    //writeLog(label3.Text + " Index:" + jumpPoints[1].Index.ToString() +
-                    //            " Position:" + jumpPoints[1].Position.ToString() +
-                    //            " Force:" + jumpPoints[1].Force.ToString());
-                    writeCSV(jumpPoints[1].Index, jumpPoints[1].Position, jumpPoints[1].Force, FileName.Split('_')[FileName.Split('_').Length - 1].Substring(0, 2), FileName.Split('\\')[FileName.Split('\\').Length - 1]);
-                }
-                else
-                {
-                    //writeCSV(jumpPoints[0].Index, jumpPoints[0].Position, jumpPoints[0].Force, FileName.Split('_')[FileName.Split('_').Length - 1].Substring(0, 2), FileName.Split('\\')[FileName.Split('\\').Length - 1]);
-                    writeCSV(-1, -1, -1, FileName.Split('_')[FileName.Split('_').Length - 1].Substring(0, 2), FileName.Split('\\')[FileName.Split('\\').Length - 1]);
-                }
+                }                
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
                 return false;
+            }
+            if (jumpPoints.Count > 0)
+            {
+                //writeLog(label3.Text + " Index:" + jumpPoints[1].Index.ToString() +
+                //            " Position:" + jumpPoints[1].Position.ToString() +
+                //            " Force:" + jumpPoints[1].Force.ToString());
+                writeCSV(jumpPoints[0].Index, jumpPoints[0].Position, jumpPoints[0].Force,
+                    FileName.Split('_')[FileName.Split('_').Length - 1].Substring(0, 2) == "OK" ? "OK" : "NG",
+                    FileName.Split('\\')[FileName.Split('\\').Length - 1]);
+            }
+            else
+            {
+                //writeCSV(jumpPoints[0].Index, jumpPoints[0].Position, jumpPoints[0].Force, FileName.Split('_')[FileName.Split('_').Length - 1].Substring(0, 2), FileName.Split('\\')[FileName.Split('\\').Length - 1]);
+                writeCSV(-1, -1, -1,
+                    FileName.Split('_')[FileName.Split('_').Length - 1].Substring(0, 2) == "OK" ? "OK" : "NG",
+                    FileName.Split('\\')[FileName.Split('\\').Length - 1]);
             }
             return mResult;
         }
@@ -515,6 +524,39 @@ namespace Get_BreakPoint
             }
         }
 
+        public double Min_X
+        {
+            get
+            {
+                if (File.Exists("config.ini"))
+                {
+                    IniFile ini = new IniFile("config.ini");
+                    if (!ini.KeyExists("Min_X"))
+                    {
+                        return -1;
+                    }
+                    string s_max = ini.Read("Min_X");
+                    try
+                    {
+                        return Convert.ToDouble(s_max);
+                    }
+                    catch (Exception)
+                    {
+                        return -1;
+                    }
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+            set
+            {
+                IniFile ini = new IniFile("config.ini");
+                ini.Write("Min_X", value.ToString());
+            }
+        }
+
         public int Continuity
         {
             get
@@ -553,6 +595,7 @@ namespace Get_BreakPoint
             textBox1.Text = WatchPath;
             nUD_K.Value = Convert.ToDecimal(K_Threshold);
             nUD_Continuity.Value = Convert.ToDecimal(Continuity);
+            nUD_MinX_Value.Value = Convert.ToDecimal(Min_X);
             if (textBox1.Text != "")
             {
                 button1_Click(sender, e);
@@ -564,6 +607,7 @@ namespace Get_BreakPoint
             WatchPath = textBox1.Text;
             K_Threshold = Convert.ToDouble(nUD_K.Value);
             Continuity = Convert.ToInt16(nUD_Continuity.Value);
+            Min_X = Convert.ToDouble(nUD_MinX_Value.Value);
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
