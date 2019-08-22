@@ -187,7 +187,7 @@ namespace Get_BreakPoint
                                         listBox1.Items.Add("Record 1");
                                         for (int i = 1; i < mPoints1.Count - 1; i++)
                                         {
-                                            if (Index_startX != 0 && mPoints1[i].Position > Convert.ToDouble(nUD_MinX_Value.Value))
+                                            if (Index_startX == 0 && mPoints1[i].Position > Convert.ToDouble(nUD_MinX_Value.Value))
                                             {
                                                 Index_startX = i;
                                             }
@@ -206,39 +206,52 @@ namespace Get_BreakPoint
                                                 if (ks[i] >= Convert.ToDouble(nUD_K.Value))
                                                 {
                                                     bool b_Continuity = true;
-                                                    for (int j = 0; j < Convert.ToInt32(nUD_Continuity.Value); j++)
+                                                    if (i + 1 + Convert.ToInt32(nUD_Continuity.Value) >= ks.Count)
                                                     {
-                                                        if (ks[i + 1 + j] < Convert.ToDouble(nUD_K.Value))
+                                                        b_Continuity = false;
+                                                    }
+                                                    else
+                                                    {
+                                                        for (int j = 0; j < Convert.ToInt32(nUD_Continuity.Value); j++)
                                                         {
-                                                            b_Continuity = false;
+
+                                                            if (ks[i + 1 + j] < Convert.ToDouble(nUD_K.Value))
+                                                            {
+                                                                b_Continuity = false;
+                                                            }
                                                         }
                                                     }
+                                                    
                                                     if (b_Continuity)//满足连续性，b_Triggered至1，jumpPoints.Add
                                                     {
                                                         b_Triggered = true;
                                                         jumpPoints.Add(mPoints1[i + 1]);
                                                     }
-                                                }
-                                            }
-                                            else//寻找连续小于
-                                            {
-                                                if (ks[i] < Convert.ToDouble(nUD_K.Value))
-                                                {
-                                                    bool b_Continuity = true;
-                                                    for (int j = 0; j < Convert.ToInt32(nUD_Continuity.Value); j++)
-                                                    {
-                                                        if (ks[i + 1 + j] >= Convert.ToDouble(nUD_K.Value))
-                                                        {
-                                                            b_Continuity = false;
-                                                        }
-                                                    }
-                                                    if (b_Continuity)//满足连续性，b_Triggered至0，dropPoints.Add
+                                                    else
                                                     {
                                                         b_Triggered = false;
-                                                        dropPoints.Add(mPoints1[i + 1]);
                                                     }
                                                 }
                                             }
+                                            //else//寻找骤降点（不合理）
+                                            //{
+                                            //    //if (ks[i] < Convert.ToDouble(nUD_K.Value))
+                                            //    //{
+                                            //    //    bool b_Continuity = true;
+                                            //    //    for (int j = 0; j < Convert.ToInt32(nUD_Continuity.Value); j++)
+                                            //    //    {
+                                            //    //        if (ks[i + 1 + j] >= Convert.ToDouble(nUD_K.Value))
+                                            //    //        {
+                                            //    //            b_Continuity = false;
+                                            //    //        }
+                                            //    //    }
+                                            //    //    if (b_Continuity)//满足连续性，b_Triggered至0，dropPoints.Add
+                                            //    //    {
+                                            //    //        b_Triggered = false;
+                                            //    //        dropPoints.Add(mPoints1[i + 1]);
+                                            //    //    }
+                                            //    //}
+                                            //}
                                         }
                                         for (int i = 0; i < jumpPoints.Count; i++)
                                         {
@@ -334,14 +347,23 @@ namespace Get_BreakPoint
                 MessageBox.Show(ex.Message);
                 return false;
             }
-            if (jumpPoints.Count > 0)
+            if (jumpPoints.Count > 1)
             {
                 //writeLog(label3.Text + " Index:" + jumpPoints[1].Index.ToString() +
                 //            " Position:" + jumpPoints[1].Position.ToString() +
                 //            " Force:" + jumpPoints[1].Force.ToString());
+                writeCSV(jumpPoints[1].Index, jumpPoints[1].Position, jumpPoints[1].Force,
+                    FileName.Split('_')[FileName.Split('_').Length - 1].Substring(0, 2) == "OK" ? "OK." : "NG",
+                    FileName.Split('\\')[FileName.Split('\\').Length - 1]);
+            }
+            else if (jumpPoints.Count == 1)
+            {
                 writeCSV(jumpPoints[0].Index, jumpPoints[0].Position, jumpPoints[0].Force,
                     FileName.Split('_')[FileName.Split('_').Length - 1].Substring(0, 2) == "OK" ? "OK" : "NG",
                     FileName.Split('\\')[FileName.Split('\\').Length - 1]);
+                //writeCSV(-1, -1, -1,
+                //    FileName.Split('_')[FileName.Split('_').Length - 1].Substring(0, 2) == "OK" ? "OK" : "NG",
+                //    FileName.Split('\\')[FileName.Split('\\').Length - 1]);
             }
             else
             {
@@ -604,10 +626,21 @@ namespace Get_BreakPoint
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            WatchPath = textBox1.Text;
-            K_Threshold = Convert.ToDouble(nUD_K.Value);
-            Continuity = Convert.ToInt16(nUD_Continuity.Value);
-            Min_X = Convert.ToDouble(nUD_MinX_Value.Value);
+            if (WatchPath != textBox1.Text||
+                K_Threshold != Convert.ToDouble(nUD_K.Value)||
+                Continuity != Convert.ToInt16(nUD_Continuity.Value)||
+                Min_X != Convert.ToDouble(nUD_MinX_Value.Value))
+            {
+                if (MessageBox.Show("Save changes? ", "Confirm", MessageBoxButtons.YesNo) == System.Windows.Forms.DialogResult.Yes)
+                {
+                    // 保存
+                    WatchPath = textBox1.Text;
+                    K_Threshold = Convert.ToDouble(nUD_K.Value);
+                    Continuity = Convert.ToInt16(nUD_Continuity.Value);
+                    Min_X = Convert.ToDouble(nUD_MinX_Value.Value);
+                }    
+            }
+                    
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
