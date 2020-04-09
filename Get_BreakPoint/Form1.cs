@@ -163,7 +163,8 @@ namespace Get_BreakPoint
                     jumpPoints = new List<mPoint>();
                     dropPoints = new List<mPoint>();
                     listp = new List<mypoint>();
-                    
+                    chart1.Series[0].Points.Clear();
+
                     int Index_startX = 0;
                     while (sReader.Peek() >= 0)
                     {
@@ -201,9 +202,9 @@ namespace Get_BreakPoint
                                 switch (recordIndex)
                                 {
                                     case 1:
-                                        chart1.DataSource = listp;
-                                        chart1.DataBind();
-
+                                        //chart1.DataSource = listp;
+                                        //chart1.DataBind();
+                                        
                                         listBox1.Items.Add("Record 1");
                                         for (int i = 1; i < mPoints1.Count - 1; i++)
                                         {
@@ -211,6 +212,7 @@ namespace Get_BreakPoint
                                             {
                                                 Index_startX = i;
                                             }
+                                            chart1.Series[0].Points.AddXY(mPoints1[i].Position, mPoints1[i].Force);
                                             deltaPoints_position.Add(((mPoints1[i + 1].Force - mPoints1[i].Force) / ((mPoints1[i + 1].Position - mPoints1[i].Position)))
                                                 - ((mPoints1[i].Force - mPoints1[i - 1].Force) / ((mPoints1[i].Position - mPoints1[i - 1].Position))));
                                             deltaPoints_time.Add(((mPoints1[i + 1].Force - mPoints1[i].Force))
@@ -273,11 +275,13 @@ namespace Get_BreakPoint
                                             //    //}
                                             //}
                                         }
+                                        chart1.Series[1].Points.Clear();
                                         for (int i = 0; i < jumpPoints.Count; i++)
                                         {
                                             listBox1.Items.Add("jumpPoints     Index:" + jumpPoints[i].Index.ToString() +
                                             " Position:" + jumpPoints[i].Position.ToString() +
                                             " Force:" + jumpPoints[i].Force.ToString());
+                                            chart1.Series[1].Points.AddXY(jumpPoints[i].Position, jumpPoints[i].Force);
                                         }
                                         //maxIndex = deltaPoints_position.FindIndex(item => item.Equals(deltaPoints_position.Max()));
                                         //minIndex = deltaPoints_position.FindIndex(item => item.Equals(deltaPoints_position.Min()));
