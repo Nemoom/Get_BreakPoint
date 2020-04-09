@@ -76,6 +76,17 @@ namespace Get_BreakPoint
             get_Points(e.FullPath);
         }
 
+        class mypoint //point类
+        {
+            public mypoint(string mPosition, string mForce)
+            {
+                Position = mPosition;
+                Force = mForce;
+            }
+            public string Position { get; set; }
+            public string Force { get; set; }
+        }
+
         public class mPoint
         {
             public int Index;
@@ -108,6 +119,7 @@ namespace Get_BreakPoint
         List<double> deltaPoints_position = new List<double>();
         List<double> deltaPoints_time = new List<double>();
         List<double> ks = new List<double>();
+        List<mypoint> listp = new List<mypoint>();
 
         int recordIndex = 0;
         int maxIndex;
@@ -137,7 +149,7 @@ namespace Get_BreakPoint
                 System.Threading.Thread.Sleep(500);
             }
             try
-            {
+            {               
                 using (StreamReader sReader = new StreamReader(FileName))
                 {
                     deltaPoints_position = new List<double>();
@@ -150,6 +162,8 @@ namespace Get_BreakPoint
                     mPoints5 = new List<mPoint>();
                     jumpPoints = new List<mPoint>();
                     dropPoints = new List<mPoint>();
+                    listp = new List<mypoint>();
+                    
                     int Index_startX = 0;
                     while (sReader.Peek() >= 0)
                     {
@@ -171,6 +185,7 @@ namespace Get_BreakPoint
                                     {
                                         case 1:
                                             mPoints1.Add(new mPoint(mStr.Split(';')[0], mStr.Split(';')[1], mStr.Split(';')[2]));
+                                            listp.Add(new mypoint(mStr.Split(';')[1], mStr.Split(';')[2]));
                                             break;
                                         case 2:
                                             mPoints2.Add(new mPoint(mStr.Split(';')[0], mStr.Split(';')[1], mStr.Split(';')[2]));
@@ -180,10 +195,15 @@ namespace Get_BreakPoint
                                     }
                                 }
                                 #endregion
+                                chart1.Series[0].XValueMember = "Position";//将listp中所有Name元素作为X轴
+                                chart1.Series[0].YValueMembers = "Force";//将listp中所有Value元素作为Y轴
 
                                 switch (recordIndex)
                                 {
                                     case 1:
+                                        chart1.DataSource = listp;
+                                        chart1.DataBind();
+
                                         listBox1.Items.Add("Record 1");
                                         for (int i = 1; i < mPoints1.Count - 1; i++)
                                         {
