@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace Get_BreakPoint
 {
@@ -642,6 +643,26 @@ namespace Get_BreakPoint
             nUD_K.Value = Convert.ToDecimal(K_Threshold);
             nUD_Continuity.Value = Convert.ToDecimal(Continuity);
             nUD_MinX_Value.Value = Convert.ToDecimal(Min_X);
+            // Zoom into the X axis
+            chart1.ChartAreas[0].AxisX.ScaleView.Zoom(2, 3);
+
+            // Enable range selection and zooming end user interface
+            chart1.ChartAreas[0].CursorX.IsUserEnabled = true;
+            chart1.ChartAreas[0].CursorX.IsUserSelectionEnabled = true;
+            chart1.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
+
+            //将滚动内嵌到坐标轴中
+            chart1.ChartAreas[0].AxisX.ScrollBar.IsPositionedInside = true;
+
+            // 设置滚动条的大小
+            chart1.ChartAreas[0].AxisX.ScrollBar.Size = 5;
+
+            // 设置滚动条的按钮的风格，下面代码是将所有滚动条上的按钮都显示出来
+            chart1.ChartAreas[0].AxisX.ScrollBar.ButtonStyle = ScrollBarButtonStyles.All;
+
+            // 设置自动放大与缩小的最小量
+            chart1.ChartAreas[0].AxisX.ScaleView.SmallScrollSize = double.NaN;
+            chart1.ChartAreas[0].AxisX.ScaleView.SmallScrollMinSize = 0.1;
             if (textBox1.Text != "")
             {
                 button1_Click(sender, e);
@@ -672,6 +693,21 @@ namespace Get_BreakPoint
             if (button1.Text != "Start")
             {
                 button1_Click(sender, e);
+            }
+        }
+
+        private void chart1_MouseMove(object sender, MouseEventArgs e)
+        {
+            HitTestResult hit = chart1.HitTest(e.X, e.Y);
+            if (hit.Series != null)
+            {
+                var xValue = hit.Series.Points[hit.PointIndex].XValue;
+                var yValue = hit.Series.Points[hit.PointIndex].YValues.First();
+                lbl_Value.Text = string.Format("{0:F0},{1:F0}", "x:" + xValue, "y:" + yValue);//textbox1也是自己建的一个专门用来显示的内容框，也可以用messagebox直接弹出内容
+            }
+            else
+            {
+
             }
         }
     }
