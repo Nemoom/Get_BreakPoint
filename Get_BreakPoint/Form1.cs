@@ -643,8 +643,27 @@ namespace Get_BreakPoint
             nUD_K.Value = Convert.ToDecimal(K_Threshold);
             nUD_Continuity.Value = Convert.ToDecimal(Continuity);
             nUD_MinX_Value.Value = Convert.ToDecimal(Min_X);
-            // Zoom into the X axis
-            chart1.ChartAreas[0].AxisX.ScaleView.Zoom(2, 3);
+            ////////// Zoom into the X axis
+            ////////chart1.ChartAreas[0].AxisX.ScaleView.Zoom(2, 3);
+
+            //////// Enable range selection and zooming end user interface
+            //////chart1.ChartAreas[0].CursorX.IsUserEnabled = true;
+            //////chart1.ChartAreas[0].CursorX.IsUserSelectionEnabled = true;
+            //////chart1.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
+
+            ////////将滚动内嵌到坐标轴中
+            //////chart1.ChartAreas[0].AxisX.ScrollBar.IsPositionedInside = true;
+
+            //////// 设置滚动条的大小
+            //////chart1.ChartAreas[0].AxisX.ScrollBar.Size = 10;
+
+            //////// 设置滚动条的按钮的风格，下面代码是将所有滚动条上的按钮都显示出来
+            //////chart1.ChartAreas[0].AxisX.ScrollBar.ButtonStyle = ScrollBarButtonStyles.All;
+
+            ////////// 设置自动放大与缩小的最小量
+            ////////chart1.ChartAreas[0].AxisX.ScaleView.SmallScrollSize = double.NaN;
+            ////////chart1.ChartAreas[0].AxisX.ScaleView.SmallScrollMinSize = 0.1;
+            #region.......chart缩放功能.........
 
             // Enable range selection and zooming end user interface
             chart1.ChartAreas[0].CursorX.IsUserEnabled = true;
@@ -655,17 +674,67 @@ namespace Get_BreakPoint
             chart1.ChartAreas[0].AxisX.ScrollBar.IsPositionedInside = true;
 
             // 设置滚动条的大小
-            chart1.ChartAreas[0].AxisX.ScrollBar.Size = 5;
+            chart1.ChartAreas[0].AxisX.ScrollBar.Size = 15;
 
-            // 设置滚动条的按钮的风格，下面代码是将所有滚动条上的按钮都显示出来
+            // 设置滚动条的按钮的风格
             chart1.ChartAreas[0].AxisX.ScrollBar.ButtonStyle = ScrollBarButtonStyles.All;
 
             // 设置自动放大与缩小的最小量
             chart1.ChartAreas[0].AxisX.ScaleView.SmallScrollSize = double.NaN;
-            chart1.ChartAreas[0].AxisX.ScaleView.SmallScrollMinSize = 0.1;
+            chart1.ChartAreas[0].AxisX.ScaleView.SmallScrollMinSize = 1;
+
+            #endregion
+
+            chart1.MouseWheel += new MouseEventHandler(chart1_MouseWheel);
+
             if (textBox1.Text != "")
             {
                 button1_Click(sender, e);
+            }
+        }
+
+        void chart1_MouseWheel(object sender, MouseEventArgs e)
+        {
+            //按住Ctrl，缩放
+            if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
+            {
+
+                if (chart1.ChartAreas[0].AxisX.ScaleView.Size.ToString() == "NaN")
+                {
+                    chart1.ChartAreas[0].AxisX.ScaleView.Size = 1;
+                }
+                else
+                {
+                    if (e.Delta < 0)
+                        chart1.ChartAreas[0].AxisX.ScaleView.Size += 4;
+                    else
+                    {
+                        try
+                        {
+                            if (chart1.ChartAreas[0].AxisX.ScaleView.Size >4)
+                            {
+                                chart1.ChartAreas[0].AxisX.ScaleView.Size -= 4;
+                            }
+                            else
+                            {
+                                MessageBox.Show("MIN");
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            chart1.ChartAreas[0].AxisX.ScaleView.Size = 0;
+                        }
+                    }
+                }
+
+            }
+            //不按Ctrl，滚动
+            else
+            {
+                if (e.Delta < 0)
+                    chart1.ChartAreas[0].AxisX.ScaleView.Position += 4;
+                else
+                    chart1.ChartAreas[0].AxisX.ScaleView.Position -= 4;
             }
         }
 
@@ -708,6 +777,52 @@ namespace Get_BreakPoint
             else
             {
 
+            }
+        }
+
+        private void btn_AutoZoom_Click(object sender, EventArgs e)
+        {
+            chart1.ChartAreas[0].AxisX.ScaleView.ZoomReset();
+        }
+
+        private void btn_Enlarge_Click(object sender, EventArgs e)
+        {
+            //chart1.ChartAreas[0].AxisX.ScaleView.Zoom(chart1.ChartAreas[0].AxisX.ScaleView.ViewMinimum, 1.1, chart1.ChartAreas[0].AxisX.ScaleView.SizeType);
+            if (chart1.ChartAreas[0].AxisX.ScaleView.Size.ToString()=="NaN")
+            {
+                chart1.ChartAreas[0].AxisX.ScaleView.Size = 0;
+            }
+            else
+            {
+                chart1.ChartAreas[0].AxisX.ScaleView.Size += 0.1;
+            }
+            
+        }
+
+        private void btn_Reduce_Click(object sender, EventArgs e)
+        {
+            if (chart1.ChartAreas[0].AxisX.ScaleView.Size.ToString() == "NaN")
+            {
+                chart1.ChartAreas[0].AxisX.ScaleView.Size = 0;
+            }
+            else
+            {
+                try
+                {
+                    if (chart1.ChartAreas[0].AxisX.ScaleView.Size>0.01)
+                    {
+                        chart1.ChartAreas[0].AxisX.ScaleView.Size -= 0.01;
+                    }
+                    else
+                    {
+                        MessageBox.Show("MIN");
+                    }
+
+                }
+                catch (Exception)
+                {
+                    chart1.ChartAreas[0].AxisX.ScaleView.Size = 0;
+                }
             }
         }
     }

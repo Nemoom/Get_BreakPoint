@@ -28,10 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.button1 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -39,6 +40,14 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.lbl_Value = new System.Windows.Forms.Label();
+            this.panel_Tools = new System.Windows.Forms.Panel();
+            this.btn_CaptureDIsplay = new System.Windows.Forms.Button();
+            this.btn_BundlePlot = new System.Windows.Forms.Button();
+            this.btn_Move = new System.Windows.Forms.Button();
+            this.btn_Reduce = new System.Windows.Forms.Button();
+            this.btn_Enlarge = new System.Windows.Forms.Button();
+            this.btn_AutoZoom = new System.Windows.Forms.Button();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.label2 = new System.Windows.Forms.Label();
@@ -56,11 +65,11 @@
             this.nUD_Continuity = new System.Windows.Forms.NumericUpDown();
             this.label6 = new System.Windows.Forms.Label();
             this.nUD_MinX_Value = new System.Windows.Forms.NumericUpDown();
-            this.lbl_Value = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            this.panel_Tools.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).BeginInit();
@@ -149,6 +158,7 @@
             // tabPage2
             // 
             this.tabPage2.Controls.Add(this.lbl_Value);
+            this.tabPage2.Controls.Add(this.panel_Tools);
             this.tabPage2.Controls.Add(this.chart1);
             this.tabPage2.Location = new System.Drawing.Point(4, 31);
             this.tabPage2.Name = "tabPage2";
@@ -158,27 +168,121 @@
             this.tabPage2.Text = "Chart";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // lbl_Value
+            // 
+            this.lbl_Value.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lbl_Value.AutoSize = true;
+            this.lbl_Value.ForeColor = System.Drawing.Color.Orange;
+            this.lbl_Value.Location = new System.Drawing.Point(462, 11);
+            this.lbl_Value.Name = "lbl_Value";
+            this.lbl_Value.Size = new System.Drawing.Size(0, 22);
+            this.lbl_Value.TabIndex = 1;
+            // 
+            // panel_Tools
+            // 
+            this.panel_Tools.AutoScroll = true;
+            this.panel_Tools.Controls.Add(this.btn_CaptureDIsplay);
+            this.panel_Tools.Controls.Add(this.btn_BundlePlot);
+            this.panel_Tools.Controls.Add(this.btn_Move);
+            this.panel_Tools.Controls.Add(this.btn_Reduce);
+            this.panel_Tools.Controls.Add(this.btn_Enlarge);
+            this.panel_Tools.Controls.Add(this.btn_AutoZoom);
+            this.panel_Tools.Dock = System.Windows.Forms.DockStyle.Right;
+            this.panel_Tools.Location = new System.Drawing.Point(588, 3);
+            this.panel_Tools.Name = "panel_Tools";
+            this.panel_Tools.Size = new System.Drawing.Size(51, 469);
+            this.panel_Tools.TabIndex = 2;
+            // 
+            // btn_CaptureDIsplay
+            // 
+            this.btn_CaptureDIsplay.BackgroundImage = global::Get_BreakPoint.Properties.Resources.曲线对比__2_;
+            this.btn_CaptureDIsplay.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btn_CaptureDIsplay.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btn_CaptureDIsplay.Location = new System.Drawing.Point(0, 255);
+            this.btn_CaptureDIsplay.Name = "btn_CaptureDIsplay";
+            this.btn_CaptureDIsplay.Size = new System.Drawing.Size(51, 51);
+            this.btn_CaptureDIsplay.TabIndex = 5;
+            this.btn_CaptureDIsplay.UseVisualStyleBackColor = true;
+            // 
+            // btn_BundlePlot
+            // 
+            this.btn_BundlePlot.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btn_BundlePlot.BackgroundImage")));
+            this.btn_BundlePlot.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btn_BundlePlot.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btn_BundlePlot.Location = new System.Drawing.Point(0, 204);
+            this.btn_BundlePlot.Name = "btn_BundlePlot";
+            this.btn_BundlePlot.Size = new System.Drawing.Size(51, 51);
+            this.btn_BundlePlot.TabIndex = 4;
+            this.btn_BundlePlot.UseVisualStyleBackColor = true;
+            // 
+            // btn_Move
+            // 
+            this.btn_Move.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btn_Move.BackgroundImage")));
+            this.btn_Move.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btn_Move.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btn_Move.Location = new System.Drawing.Point(0, 153);
+            this.btn_Move.Name = "btn_Move";
+            this.btn_Move.Size = new System.Drawing.Size(51, 51);
+            this.btn_Move.TabIndex = 3;
+            this.btn_Move.UseVisualStyleBackColor = true;
+            // 
+            // btn_Reduce
+            // 
+            this.btn_Reduce.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btn_Reduce.BackgroundImage")));
+            this.btn_Reduce.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btn_Reduce.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btn_Reduce.Location = new System.Drawing.Point(0, 102);
+            this.btn_Reduce.Name = "btn_Reduce";
+            this.btn_Reduce.Size = new System.Drawing.Size(51, 51);
+            this.btn_Reduce.TabIndex = 2;
+            this.btn_Reduce.UseVisualStyleBackColor = true;
+            this.btn_Reduce.Click += new System.EventHandler(this.btn_Reduce_Click);
+            // 
+            // btn_Enlarge
+            // 
+            this.btn_Enlarge.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btn_Enlarge.BackgroundImage")));
+            this.btn_Enlarge.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btn_Enlarge.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btn_Enlarge.Location = new System.Drawing.Point(0, 51);
+            this.btn_Enlarge.Name = "btn_Enlarge";
+            this.btn_Enlarge.Size = new System.Drawing.Size(51, 51);
+            this.btn_Enlarge.TabIndex = 1;
+            this.btn_Enlarge.UseVisualStyleBackColor = true;
+            this.btn_Enlarge.Click += new System.EventHandler(this.btn_Enlarge_Click);
+            // 
+            // btn_AutoZoom
+            // 
+            this.btn_AutoZoom.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btn_AutoZoom.BackgroundImage")));
+            this.btn_AutoZoom.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btn_AutoZoom.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btn_AutoZoom.Location = new System.Drawing.Point(0, 0);
+            this.btn_AutoZoom.Name = "btn_AutoZoom";
+            this.btn_AutoZoom.Size = new System.Drawing.Size(51, 51);
+            this.btn_AutoZoom.TabIndex = 0;
+            this.btn_AutoZoom.UseVisualStyleBackColor = true;
+            this.btn_AutoZoom.Click += new System.EventHandler(this.btn_AutoZoom_Click);
+            // 
             // chart1
             // 
-            chartArea1.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea1);
+            chartArea2.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea2);
             this.chart1.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend1.Name = "Legend1";
-            this.chart1.Legends.Add(legend1);
+            legend2.Name = "Legend1";
+            this.chart1.Legends.Add(legend2);
             this.chart1.Location = new System.Drawing.Point(3, 3);
             this.chart1.Name = "chart1";
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series1.IsVisibleInLegend = false;
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            series2.ChartArea = "ChartArea1";
-            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
-            series2.IsVisibleInLegend = false;
-            series2.Legend = "Legend1";
-            series2.Name = "Series2";
-            this.chart1.Series.Add(series1);
-            this.chart1.Series.Add(series2);
+            series3.ChartArea = "ChartArea1";
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series3.IsVisibleInLegend = false;
+            series3.Legend = "Legend1";
+            series3.Name = "Series1";
+            series4.ChartArea = "ChartArea1";
+            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+            series4.IsVisibleInLegend = false;
+            series4.Legend = "Legend1";
+            series4.Name = "Series2";
+            this.chart1.Series.Add(series3);
+            this.chart1.Series.Add(series4);
             this.chart1.Size = new System.Drawing.Size(636, 469);
             this.chart1.TabIndex = 0;
             this.chart1.Text = "chart1";
@@ -191,7 +295,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 31);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(13, 17, 13, 18);
-            this.tabPage1.Size = new System.Drawing.Size(642, 186);
+            this.tabPage1.Size = new System.Drawing.Size(642, 475);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "BreakPoint";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -218,7 +322,7 @@
             this.listBox1.Location = new System.Drawing.Point(123, 17);
             this.listBox1.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(506, 151);
+            this.listBox1.Size = new System.Drawing.Size(506, 440);
             this.listBox1.TabIndex = 4;
             // 
             // openFileDialog1
@@ -370,16 +474,6 @@
             0,
             0});
             // 
-            // lbl_Value
-            // 
-            this.lbl_Value.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbl_Value.AutoSize = true;
-            this.lbl_Value.ForeColor = System.Drawing.Color.Orange;
-            this.lbl_Value.Location = new System.Drawing.Point(508, 10);
-            this.lbl_Value.Name = "lbl_Value";
-            this.lbl_Value.Size = new System.Drawing.Size(0, 22);
-            this.lbl_Value.TabIndex = 1;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 22F);
@@ -403,6 +497,7 @@
             this.tabControl1.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.tabPage2.PerformLayout();
+            this.panel_Tools.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
@@ -446,6 +541,13 @@
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
         private System.Windows.Forms.Label lbl_Value;
+        private System.Windows.Forms.Panel panel_Tools;
+        private System.Windows.Forms.Button btn_CaptureDIsplay;
+        private System.Windows.Forms.Button btn_BundlePlot;
+        private System.Windows.Forms.Button btn_Move;
+        private System.Windows.Forms.Button btn_Reduce;
+        private System.Windows.Forms.Button btn_Enlarge;
+        private System.Windows.Forms.Button btn_AutoZoom;
     }
 }
 
