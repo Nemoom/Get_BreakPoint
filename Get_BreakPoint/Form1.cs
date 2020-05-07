@@ -668,6 +668,8 @@ namespace Get_BreakPoint
             // Enable range selection and zooming end user interface
             chart1.ChartAreas[0].CursorX.IsUserEnabled = true;
             chart1.ChartAreas[0].CursorX.IsUserSelectionEnabled = true;
+            chart1.ChartAreas[0].AxisX.Title = "Position[mm]";
+            chart1.ChartAreas[0].AxisY.Title = "Force[N]";
             chart1.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
 
             //将滚动内嵌到坐标轴中
@@ -787,15 +789,16 @@ namespace Get_BreakPoint
 
         private void btn_Enlarge_Click(object sender, EventArgs e)
         {
-            //chart1.ChartAreas[0].AxisX.ScaleView.Zoom(chart1.ChartAreas[0].AxisX.ScaleView.ViewMinimum, 1.1, chart1.ChartAreas[0].AxisX.ScaleView.SizeType);
-            if (chart1.ChartAreas[0].AxisX.ScaleView.Size.ToString()=="NaN")
-            {
-                chart1.ChartAreas[0].AxisX.ScaleView.Size = 0;
-            }
-            else
-            {
-                chart1.ChartAreas[0].AxisX.ScaleView.Size += 0.1;
-            }
+            chart1.ChartAreas[0].AxisX.ScaleView.Zoom(Math.Round(chart1.ChartAreas[0].AxisX.ScaleView.ViewMaximum - 0.9 * (chart1.ChartAreas[0].AxisX.ScaleView.ViewMaximum - chart1.ChartAreas[0].AxisX.ScaleView.ViewMinimum),3), 
+                                                      Math.Round(chart1.ChartAreas[0].AxisX.ScaleView.ViewMinimum + 0.9 * (chart1.ChartAreas[0].AxisX.ScaleView.ViewMaximum - chart1.ChartAreas[0].AxisX.ScaleView.ViewMinimum),3));
+            //if (chart1.ChartAreas[0].AxisX.ScaleView.Size.ToString()=="NaN")
+            //{
+            //    chart1.ChartAreas[0].AxisX.ScaleView.Size = 0;
+            //}
+            //else
+            //{
+            //    chart1.ChartAreas[0].AxisX.ScaleView.Size += 0.1;
+            //}
             
         }
 
@@ -809,21 +812,38 @@ namespace Get_BreakPoint
             {
                 try
                 {
-                    if (chart1.ChartAreas[0].AxisX.ScaleView.Size>0.01)
-                    {
-                        chart1.ChartAreas[0].AxisX.ScaleView.Size -= 0.01;
-                    }
-                    else
-                    {
-                        MessageBox.Show("MIN");
-                    }
+                    chart1.ChartAreas[0].AxisX.ScaleView.Size += 0.1;
+                    //if (chart1.ChartAreas[0].AxisX.ScaleView.Size>0.01)
+                    //{
+                    //    chart1.ChartAreas[0].AxisX.ScaleView.Size -= 0.01;
+                    //}
+                    //else
+                    //{
+                    //    MessageBox.Show("MIN");
+                    //}
 
                 }
                 catch (Exception)
                 {
-                    chart1.ChartAreas[0].AxisX.ScaleView.Size = 0;
+                    //chart1.ChartAreas[0].AxisX.ScaleView.Size = 0;
                 }
             }
+        }
+
+        private void btn_CaptureDIsplay_Click(object sender, EventArgs e)
+        {
+            //Graphics dc = chart1.CreateGraphics();
+            //Show();
+            //Pen bluePen = new Pen(Color.Blue, 3);
+            //dc.DrawRectangle(bluePen, 100, 100, 50, 50);
+
+            Bitmap b = new Bitmap(chart1.Width, chart1.Height);
+            Graphics g = Graphics.FromImage(b);
+            Rectangle rect = new Rectangle((chart1.Width / 2) - 128, (chart1.Height / 2) - 152, 256, 304);
+            g.DrawRectangle(new Pen(Color.Blue, 2), 100, 100, 50, 50);
+            g.Dispose();
+            b.Save("Capture.bmp");
+            chart1.ChartAreas[0].BackImage = "Capture.bmp";
         }
     }
 }
