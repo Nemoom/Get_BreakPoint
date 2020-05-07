@@ -832,11 +832,13 @@ namespace Get_BreakPoint
 
         private void btn_CaptureDIsplay_Click(object sender, EventArgs e)
         {
+            //Methods a
             //Graphics dc = chart1.CreateGraphics();
             //Show();
             //Pen bluePen = new Pen(Color.Blue, 3);
             //dc.DrawRectangle(bluePen, 100, 100, 50, 50);
 
+            //Methods b
             Bitmap b = new Bitmap(chart1.Width, chart1.Height);
             Graphics g = Graphics.FromImage(b);
             Rectangle rect = new Rectangle((chart1.Width / 2) - 128, (chart1.Height / 2) - 152, 256, 304);
